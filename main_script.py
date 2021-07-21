@@ -27,6 +27,7 @@ identity_cutoff = 95
 n_threads = 20
 
 if not has_bwa_index(work_dir):
+    print('Building bwa index/n')
     makeBWAindex(fasta_file)
 
 # Iterate over conditions
