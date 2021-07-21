@@ -10,7 +10,7 @@ python >= 3.6
 """
 import os
 import subprocess
-from metaT2genome.filter_by_identity import filterSAMbyIdentity
+import metaT2genome.filter_by_identity as fi
 import metaT2genome.helper_functions as hf
 
 __author__ = 'Semidán Robaina Estévez'
@@ -28,7 +28,7 @@ hf.bwaAlign(fasta_file, fastq_1_file, fastq_2_file,
             n_threads=1, output_dir=None)
 
 # Filter by identity
-filterSAMbyIdentity(input_path, identity_cutoff=95, output_path=None)
+fi.filterSAMbyIdentity(input_path, identity_cutoff=95, output_path=None)
 
 # Sort-by-name filtered SAM (required by htseq-count)
 hf.sortSAMbyName(sam_file, output_dir=None)
