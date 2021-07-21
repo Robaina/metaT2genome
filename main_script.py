@@ -27,7 +27,7 @@ identity_cutoff = 95
 n_threads = 20
 
 if not has_bwa_index(work_dir):
-    print('Building bwa index/n')
+    print('Building bwa index\n')
     makeBWAindex(fasta_file)
 
 # Iterate over conditions
@@ -38,7 +38,8 @@ for condition, (fastq_1_file, fastq_2_file) in paired_fastqs.items():
     print(f'Processing condition: {condition}')
     
     print('\t1.Aligning metaT to reference genome')
-    bwaAlign(fasta_file, fastq_1_file, fastq_2_file, 
+    bwaAlign(fasta_file, os.path.join(data_dir, fastq_1_file),
+             os.path.join(data_dir, fastq_2_file), 
              n_threads=n_threads, output_dir=f'temp/{condition}.sam',
              only_mapped=True, additional_params=None)
     

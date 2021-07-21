@@ -10,6 +10,6 @@ def htseqCount(sorted_sam: str, gtf_file: str, feature_type='gene',
     if output_dir is None:
         output_dir = f'{sorted_sam.split(".sam")[0]}_counts.tsv'
     htseq_command = (f'htseq-count --order name --stranded yes --type {feature_type} '
-                     f'--idattr {feature_id} {additional_params} {sorted_sam} '
+                     f'--idattr {feature_id} {sorted_sam} '
                      f'{gtf_file} > {output_dir}')
     terminalExecute(htseq_command)
