@@ -7,17 +7,15 @@
 3. Sort paired-end entries by name
 4. Count reads with htseq-count
 
+   Semidán Robaina Estévez (srobaina@ull.edu.es)
    Python >= 3.6
 """
 import os
-from metaT2genome.metaT2genome.align import has_bwa_index, makeBWAindex, bwaAlign
-from metaT2genome.metaT2genome.count import htseqCount
-from metaT2genome.metaT2genome.filtersam import filterSAMbyIdentity
-from metaT2genome.metaT2genome.utils import (terminalExecute, sortSAMbyName,
-                                             deleteTemporaryFiles, getFastqPairedFiles)
-
-__author__ = 'Semidán Robaina Estévez'
-__email__ = 'srobaina@ull.edu.es'
+from metaT2genome.align import has_bwa_index, makeBWAindex, bwaAlign
+from metaT2genome.count import htseqCount
+from metaT2genome.filtersam import filterSAMbyIdentity
+from metaT2genome.utils import (terminalExecute, sortSAMbyName,
+                                deleteTemporaryFiles, getFastqPairedFiles)
 
 work_dir = os.getcwd()
 fasta_file = 'MIT9301/Prochlorococcus_marinus_str_MIT_9301.fasta'
@@ -32,7 +30,7 @@ if not has_bwa_index(work_dir):
 
 # Iterate over conditions
 paired_fastqs = getFastqPairedFiles(data_dir) 
-paired_fastqs = {k: v for k,v in paired_fastqs.items() if k == 'ERS488299'}
+paired_fastqs = {k: v for k,v in paired_fastqs.items() if k == 'ERS488299'} # PRUEBA
 for condition, (fastq_1_file, fastq_2_file) in paired_fastqs.items():
     
     print(f'Processing condition: {condition}')

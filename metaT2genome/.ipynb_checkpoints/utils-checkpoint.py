@@ -3,21 +3,18 @@ import subprocess
 import numpy as np
 
 
-def terminalExecute(command_str: str, use_shell=False,
-                    capture_output=False) -> None:
+def terminalExecute(command_str: str) -> None:
     """
-    Execute given command in terminal through Python's subprocess
-    use_shell: leave false if executing script within conda environment
+    Execute given command in terminal through Python
     """
-    subprocess.run(command_str.split(' '), shell=use_shell, 
-                   capture_output=capture_output)
+    os.system(command_str)
     
 def deleteTemporaryFiles(dir_path: str) -> None:
     """
     Remove temporary SAM files from directory
     """
-    for fname in os.listdir(die_path):
-        os.remove(os.path.join(dir, fname))
+    for fname in os.listdir(dir_path):
+        os.remove(os.path.join(dir_path, fname))
 
 def getFastqPairedFiles(data_dir: str, pattern: tuple=('_1.', '_2.')) -> dict:
     """
