@@ -7,7 +7,7 @@ def terminalExecute(command_str: str) -> None:
     """
     Execute given command in terminal through Python's subprocess
     """
-    subprocess.run(command_str.split(' '))
+    subprocess.run(command_str.split(' '), shell=True)
     
 def deleteTemporaryFiles(dir_path: str) -> None:
     """

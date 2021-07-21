@@ -28,9 +28,9 @@ def bwaAlign(fasta_file: str, fastq_1_file: str, fastq_2_file: str=None,
     only_mapped: return only primarily aligned fragments
     """
     if only_mapped:
-        output_str = f'| samtools view -S -F 4 - > {out_sam_file}'
+        output_str = f'| samtools view -S -F 4 - > {output_dir}'
     else:
-        output_str = f'> {out_sam_file}'
+        output_str = f'> {output_dir}'
     bwa_command = (f'bwa mem -M -t {n_threads} {additional_params} {fasta_file} '
                    f' {fastq_1_file} {fastq_2_file} {output_str}')
     terminalExecute(bwa_command)

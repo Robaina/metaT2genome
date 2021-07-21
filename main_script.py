@@ -35,7 +35,6 @@ paired_fastqs = {k: v for k,v in paired_fastqs.items() if k == 'ERS488299'}
 for condition, (fastq_1_file, fastq_2_file) in paired_fastqs.items():
     
     print(f'Processing condition: {condition}')
-    terminalExecute('conda activate samtools')
     
     print('\t1.Aligning metaT to reference genome')
     bwaAlign(fasta_file, fastq_1_file, fastq_2_file, 
@@ -47,13 +46,9 @@ for condition, (fastq_1_file, fastq_2_file) in paired_fastqs.items():
                         output_path=f'temp/{condition}_filtered_at_{identity_cutoff}.sam')
     
     print('\t3.Sorting SAM by name')
-    
     # required by htseq-count
     sortSAMbyName(f'temp/{condition}_filtered_at_{identity_cutoff}.sam',
                   output_dir=f'sam_files/{condition}_filtered_at_{identity_cutoff}_sorted.sam')
-
-    terminalExecute('conda deactivate samtools')
-    terminalExecute('conda activate htseq')
     
     print('\t4.Counting reads\n')
     htseqCount(f'sam_files/{condition}_filtered_at_{identity_cutoff}_sorted.sam',
@@ -61,6 +56,5 @@ for condition, (fastq_1_file, fastq_2_file) in paired_fastqs.items():
                feature_id='gene_id', output_dir=f'counts/{condition}_counts.tsv',
                additional_params=None)
 
-    terminalExecute('conda deactivate htseq')
     deleteTemporaryFiles('temp')
     
