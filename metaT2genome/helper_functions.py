@@ -33,12 +33,13 @@ def makeBWAindex(fasta_file: str) -> None:
     bwa_index_command = f'bwa index {fasta_file}'
     terminalExecute(bwa_index_command)
     
-def getFastqPairedFiles(data_dir: str, pattern: tuple=('_1', '_2')) -> dict:
+def getFastqPairedFiles(data_dir: str, pattern: tuple=('_1.', '_2.')) -> dict:
     """
     Group paired-end fastq files by condition
     """
     fnames = os.listdir(data_dir)
-    conditions = np.unique([fname.split(pattern[0])[0] for fname in fnames]).tolist()
+    conditions = np.unique([fname.split(pattern[0])[0].split(pattern[1])[0] 
+                            for fname in fnames]).tolist()
     return {
         condition: [fname for fname in fnames if condition in fname] 
         for condition in conditions
