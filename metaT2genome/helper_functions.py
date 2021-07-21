@@ -1,5 +1,6 @@
 import os
 import subprocess
+import numpy as np
 
 
 def terminalExecute(command_str: str) -> None:
@@ -31,15 +32,31 @@ def makeBWAindex(fasta_file: str) -> None:
     """
     bwa_index_command = f'bwa index {fasta_file}'
     terminalExecute(bwa_index_command)
+    
+def getFastqPairedFiles(data_dir: str, pattern: tuple=('_1', '_2')) -> dict:
+    """
+    Group paired-end fastq files by condition
+    """
+    fnames = os.listdir(data_dir)
+    conditions = np.unique([fname.split(pattern[0])[0] for fname in fnames]).tolist()
+    return {
+        condition: [fname for fname in fnames if condition in fname] 
+        for condition in conditions
+    }
 
-def bwaAlign(fasta_file: str, fastq_1_file: str, fastq_2_file=None, 
-             n_threads=1, output_dir=None, 
-             additional_params=None) -> None:
+def bwaAlign(fasta_file: str, fastq_1_file: str, fastq_2_file: str=None, 
+             n_threads: int=1, output_dir: str=None, only_mapped: bool=False
+             additional_params: str=None) -> None:
     """
     Align sequences to reference genome through BWA-mem
+    only_mapped: return only primarily aligned fragments
     """
+    if only_mapped:
+        output_str = f'| samtools view -S -F 4 - > {out_sam_file}'
+    else:
+        output_str = f'> {out_sam_file}'
     bwa_command = (f'bwa mem -M -t {n_threads} {additional_params} {fasta_file} '
-                   f' {fastq_1_file} {fastq_2_file} > {out_sam_file}')
+                   f' {fastq_1_file} {fastq_2_file} {output_str}')
     terminalExecute(bwa_command)
     
 def sortSAMbyName(sam_file: str, output_dir=None) -> None:
