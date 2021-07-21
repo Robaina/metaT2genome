@@ -1,5 +1,5 @@
 import os
-from utils import terminalExecute
+from .utils import terminalExecute
 
 def has_bwa_index(fasta_file: str, work_dir=None) -> bool:
     """

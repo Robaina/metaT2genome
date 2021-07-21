@@ -10,11 +10,11 @@
    Python >= 3.6
 """
 import os
-from metaT2genome.align import has_bwa_index, makeBWAindex, bwaAlign
-from metaT2genome.count import htseqCount
-from metaT2genome.filtersam import filterSAMbyIdentity
-from metaT2genome.utils import (terminalExecute, sortSAMbyName,
-                                deleteTemporaryFiles, getFastqPairedFiles)
+from metaT2genome.metaT2genome.align import has_bwa_index, makeBWAindex, bwaAlign
+from metaT2genome.metaT2genome.count import htseqCount
+from metaT2genome.metaT2genome.filtersam import filterSAMbyIdentity
+from metaT2genome.metaT2genome.utils import (terminalExecute, sortSAMbyName,
+                                             deleteTemporaryFiles, getFastqPairedFiles)
 
 __author__ = 'Semidán Robaina Estévez'
 __email__ = 'srobaina@ull.edu.es'
