@@ -45,7 +45,7 @@ def getFastqPairedFiles(data_dir: str, pattern: tuple=('_1', '_2')) -> dict:
     }
 
 def bwaAlign(fasta_file: str, fastq_1_file: str, fastq_2_file: str=None, 
-             n_threads: int=1, output_dir: str=None, only_mapped: bool=False
+             n_threads: int=1, output_dir: str=None, only_mapped: bool=False,
              additional_params: str=None) -> None:
     """
     Align sequences to reference genome through BWA-mem
