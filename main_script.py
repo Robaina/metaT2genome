@@ -12,7 +12,7 @@
 """
 import os
 from metaT2genome.src.align import has_bwa_index, makeBWAindex, bwaAlign
-from metaT2genome.src.count import htseqCount
+from metaT2genome.src.count import htseqCount, tpmNormalizeHtseqOutput
 from metaT2genome.src.filtersam import filterSAMbyIdentity
 from metaT2genome.src.utils import (terminalExecute, sortSAMbyName,
                                     deleteTemporaryFiles, getFastqPairedFiles)
@@ -20,6 +20,7 @@ from metaT2genome.src.utils import (terminalExecute, sortSAMbyName,
 work_dir = os.getcwd()
 fasta_file = 'MIT9301/Prochlorococcus_marinus_str_MIT_9301.fasta'
 gtf_file = 'MIT9301/MIT9301.gtf'
+gbk_file = 'MIT9301/MIT9301.gb'
 data_dir = '/usr/gonzalez/metagenomes/salazar2019/download/pe'
 identity_cutoff = 95
 n_threads = 20
@@ -31,6 +32,7 @@ if not has_bwa_index(work_dir):
 # Iterate over conditions
 paired_fastqs = getFastqPairedFiles(data_dir) 
 paired_fastqs = {k: v for k,v in paired_fastqs.items() if k == 'ERS488299'} # PRUEBA
+n_conds = len(paired_fastqs)
 for condition, (fastq_1_file, fastq_2_file) in paired_fastqs.items():
     
     print(f'Processing condition: {condition}')
@@ -50,11 +52,15 @@ for condition, (fastq_1_file, fastq_2_file) in paired_fastqs.items():
     sortSAMbyName(f'temp/{condition}_filtered_at_{identity_cutoff}.sam',
                   output_dir=f'sam_files/{condition}_filtered_at_{identity_cutoff}_sorted.sam')
     
-    print('\t4.Counting reads\n')
+    print('\t4.Counting reads')
     htseqCount(f'sam_files/{condition}_filtered_at_{identity_cutoff}_sorted.sam',
                gtf_file, feature_type='gene',
                feature_id='gene_id', output_dir=f'counts/{condition}_counts.tsv',
                additional_params=None)
-
+    
+    print('\t5.TPM normalizing counts\n')
+    tpmNormalizeHtseqOutput(f'counts/{condition}_counts.tsv', gbk_file,
+                            output_dir=f'tpm/{condition}_tpm.tsv')
+    
     deleteTemporaryFiles('temp')
     

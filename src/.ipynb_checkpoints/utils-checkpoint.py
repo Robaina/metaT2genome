@@ -1,13 +1,17 @@
-#!/usr/bin/env python3
+"""
+Functions for general purposes
+"""
 import os
 import subprocess
 import numpy as np
 
 
-def terminalExecute(command_str: str) -> None:
+def terminalExecute(command_str: str, suppress_output=False) -> None:
     """
     Execute given command in terminal through Python
     """
+    if suppress_output:
+        command_str = f'{command_str} >/dev/null 2>&1'
     os.system(command_str)
     
 def deleteTemporaryFiles(dir_path: str) -> None:

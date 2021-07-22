@@ -1,4 +1,7 @@
-#!/usr/bin/env python3
+"""
+Functions to call aligners
+"""
+
 import os
 from .utils import terminalExecute
 
@@ -30,7 +33,7 @@ def bwaAlign(fasta_file: str, fastq_1_file: str, fastq_2_file: str=None,
     """
     Align sequences to reference genome through BWA-mem
     only_mapped: return only primarily aligned fragments.
-    Verbose levels -v: 0 (nothing), 1 (error), 2 (error+warning), 3 (progress messages)
+    SAM flag 4: Read unmapped (-F 4: filter out unmapped reads)
     """
     if db_prefix is None:
         db_prefix = os.path.basename(fasta_file).split('.')[0]
@@ -40,6 +43,6 @@ def bwaAlign(fasta_file: str, fastq_1_file: str, fastq_2_file: str=None,
         output_str = f'| samtools view -S -h -F 4 - > {output_dir}'
     else:
         output_str = f'> {output_dir}'
-    bwa_command = (f'bwa mem -M -v 0 -t {n_threads} {db_prefix} '
+    bwa_command = (f'bwa mem -M -t {n_threads} {db_prefix} '
                    f'{fastq_1_file} {fastq_2_file} {output_str}')
     terminalExecute(bwa_command)
