@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+"""
+Functions and classes to deal with GeneBank files
+"""
 from Bio import SeqIO
 import os
 
