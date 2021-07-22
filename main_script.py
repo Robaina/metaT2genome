@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
 
 """
@@ -11,11 +11,11 @@
    Python >= 3.6
 """
 import os
-from metaT2genome.align import has_bwa_index, makeBWAindex, bwaAlign
-from metaT2genome.count import htseqCount
-from metaT2genome.filtersam import filterSAMbyIdentity
-from metaT2genome.utils import (terminalExecute, sortSAMbyName,
-                                deleteTemporaryFiles, getFastqPairedFiles)
+from metaT2genome.src.align import has_bwa_index, makeBWAindex, bwaAlign
+from metaT2genome.src.count import htseqCount
+from metaT2genome.src.filtersam import filterSAMbyIdentity
+from metaT2genome.src.utils import (terminalExecute, sortSAMbyName,
+                                    deleteTemporaryFiles, getFastqPairedFiles)
 
 work_dir = os.getcwd()
 fasta_file = 'MIT9301/Prochlorococcus_marinus_str_MIT_9301.fasta'

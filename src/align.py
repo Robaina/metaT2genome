@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
 import os
 from .utils import terminalExecute
+
 
 def has_bwa_index(fasta_file: str, work_dir=None) -> bool:
     """
@@ -33,7 +35,7 @@ def bwaAlign(fasta_file: str, fastq_1_file: str, fastq_2_file: str=None,
     if db_prefix is None:
         db_prefix = os.path.basename(fasta_file).split('.')[0]
     if output_dir is None:
-        output_dir = f'{os.path.basename(fastq_1_file).split('_1.')[0]}.sam'
+        output_dir = f'{os.path.basename(fastq_1_file).split("_1.")[0]}.sam'
     if only_mapped:
         output_str = f'| samtools view -S -h -F 4 - > {output_dir}'
     else:

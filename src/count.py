@@ -1,4 +1,6 @@
+#!/usr/bin/env python3
 from .utils import terminalExecute
+
 
 def htseqCount(sorted_sam: str, gtf_file: str, feature_type='gene',
                feature_id='gene_id', output_dir=None,

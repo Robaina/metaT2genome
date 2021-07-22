@@ -1,7 +1,9 @@
-from .metaT2genome import utils
-from .metaT2genome import filtersam
-from .metaT2genome import align
-from .metaT2genome import count
+from .src import utils
+from .src import filtersam
+from .src import align
+from .src import count
 
-__author__ = 'Semidán Robaina Estévez'
-__email__ = 'srobaina@ull.edu.es'
+
+
+#__author__ = 'Semidán Robaina Estévez'
+#__email__ = 'srobaina@ull.edu.es'
