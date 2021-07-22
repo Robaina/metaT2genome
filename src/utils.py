@@ -35,12 +35,12 @@ def getFastqPairedFiles(data_dir: str, pattern: tuple=('_1.', '_2.')) -> dict:
         for condition in conditions
     }
     
-def sortSAMbyName(sam_file: str, output_dir=None) -> None:
+def sortSAMbyName(sam_file: str, output_dir=None, suppress_output=False) -> None:
     """
     Sort SAM entries by name. Required by htseq-count to process paired-end data.
     """
     if output_dir is None:
         output_dir = f'{sam_file.split(".sam")[0]}_sorted.sam'
     samtools_command = f'samtools sort -n -O sam {sam_file} > {output_dir}'
-    terminalExecute(samtools_command)  
+    terminalExecute(samtools_command, suppress_output=suppress_output)  
     

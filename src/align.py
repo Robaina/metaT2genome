@@ -18,18 +18,18 @@ def has_bwa_index(fasta_file: str, work_dir=None) -> bool:
         any([ext in fname for fname in dir_files])
         for ext in index_extensions]) == True
 
-def makeBWAindex(fasta_file: str, db_prefix=None) -> None:
+def makeBWAindex(fasta_file: str, db_prefix=None, suppress_output=False) -> None:
     """
     Make BWA index from fasta file
     """
     if db_prefix is None:
         db_prefix = os.path.basename(fasta_file).split('.')[0]
     bwa_index_command = f'bwa index -p {db_prefix} {fasta_file}'
-    terminalExecute(bwa_index_command)
+    terminalExecute(bwa_index_command,suppress_output=suppress_output)
     
 def bwaAlign(fasta_file: str, fastq_1_file: str, fastq_2_file: str=None, 
              n_threads: int=1, output_dir: str=None, only_mapped: bool=False,
-             db_prefix=None, additional_params: str=None) -> None:
+             db_prefix=None, additional_params: str=None, suppress_output=False) -> None:
     """
     Align sequences to reference genome through BWA-mem
     only_mapped: return only primarily aligned fragments.
@@ -45,4 +45,4 @@ def bwaAlign(fasta_file: str, fastq_1_file: str, fastq_2_file: str=None,
         output_str = f'> {output_dir}'
     bwa_command = (f'bwa mem -M -t {n_threads} {db_prefix} '
                    f'{fastq_1_file} {fastq_2_file} {output_str}')
-    terminalExecute(bwa_command)
+    terminalExecute(bwa_command, suppress_output=suppress_output)

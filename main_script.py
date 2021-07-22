@@ -21,7 +21,7 @@ work_dir = os.getcwd()
 fasta_file = 'MIT9301/Prochlorococcus_marinus_str_MIT_9301.fasta'
 gtf_file = 'MIT9301/MIT9301.gtf'
 gbk_file = 'MIT9301/MIT9301.gb'
-data_dir = '/usr/gonzalez/metagenomes/salazar2019/download/pe'
+data_dir = '/usr/gonzalez/metagenomes/salazar2019/cleanmergedfastp'
 identity_cutoff = 95
 n_threads = 20
 
@@ -31,11 +31,11 @@ if not has_bwa_index(work_dir):
 
 # Iterate over conditions
 paired_fastqs = getFastqPairedFiles(data_dir) 
-paired_fastqs = {k: v for k,v in paired_fastqs.items() if k == 'ERS488299'} # PRUEBA
 n_conds = len(paired_fastqs)
-for condition, (fastq_1_file, fastq_2_file) in paired_fastqs.items():
+
+for n, (condition, (fastq_1_file, fastq_2_file)) in enumerate(paired_fastqs.items()):
     
-    print(f'Processing condition: {condition}')
+    print(f'Processing condition ({n + 1}/{n_conds}): {condition}')
     
     print('\t1.Aligning metaT to reference genome')
     bwaAlign(fasta_file, os.path.join(data_dir, fastq_1_file),

@@ -9,7 +9,7 @@ from .gbk import getGeneLengthsFromGBK
 
 def htseqCount(sorted_sam: str, gtf_file: str, feature_type='gene',
                feature_id='gene_id', output_dir=None,
-               additional_params: str=None) -> None:
+               additional_params: str=None, suppress_output=False) -> None:
     """
     Count reads in SAM file through hseq-count
     Additional hseq-count params can be passed as a string to the argument: 
@@ -20,7 +20,7 @@ def htseqCount(sorted_sam: str, gtf_file: str, feature_type='gene',
     htseq_command = (f'htseq-count --order name --stranded yes --type {feature_type} '
                      f'--idattr {feature_id} --quiet {sorted_sam} '
                      f'{gtf_file} > {output_dir}')
-    terminalExecute(htseq_command)
+    terminalExecute(htseq_command, suppress_output=suppress_output)
     
 def getCountDataframeFromHtseqOutput(counts_tsv: str):
     """
@@ -41,7 +41,7 @@ def tpmNormalizeCounts(counts, gbk_file: str):
     Apply TPM normalization to read counts (pandas dataframe)
     tpm.to_csv('tpm.tsv', sep='\t') to save as tsv
     """
-    gene_lengths = getGeneLengthsFromGBK('Data/MIT9301.gb')
+    gene_lengths = getGeneLengthsFromGBK(gbk_file)
     counts_gene_lengths = {}
     for gene_id in counts.index:
         if gene_id in gene_lengths.keys():
