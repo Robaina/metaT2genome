@@ -51,6 +51,7 @@ def tpmNormalizeCounts(counts, gbk_file: str):
             
     rpk = counts.divide(list(counts_gene_lengths.values()), axis=0)
     tpm = rpk.divide(rpk.sum(axis=0).values / 1e6, axis=1)
+    tpm.rename(columns={'counts': 'tpm'})
     return tpm
 
 def tpmNormalizeHtseqOutput(counts_tsv: str, gbk_file: str,
@@ -64,3 +65,27 @@ def tpmNormalizeHtseqOutput(counts_tsv: str, gbk_file: str,
     counts = getCountDataframeFromHtseqOutput(counts_tsv)
     tpm = tpmNormalizeCounts(counts, gbk_file)
     tpm.to_csv(output_dir, sep='\t')
+    
+def aggregateTPMresults(tpm_dir: str, sep_type: str='\t',
+                        output_dir: str=None) -> None:
+    """
+    Aggregate sample tpm files into a single file
+    tpm_dir: path to directory containing tpm files
+    """
+    if output_dir is None:
+        output_dir = os.path.join(tpm_dir, 'aggregated_tpm.tsv')
+    tpm_files = os.listdir(tpm_dir)
+    li = []
+    conditions = []
+    for fname in tpm_files:
+        sample_id = os.path.basename(fname).split('_')[0]
+        conditions.append(sample_id)
+        df = pd.read_csv(os.path.join(tpm_dir, fname), index_col='gene_id',
+                         header=0, sep=sep_type)
+        li.append(df)
+
+    df = pd.concat(li, axis=1, ignore_index=True)
+    df.columns = conditions
+    df.to_csv(output_dir, sep=sep_type)
+
+    

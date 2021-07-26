@@ -5,6 +5,18 @@ import sys
 import re
 import time
 import numpy as np
+from .utils import terminalExecute
+
+
+def extractSegmentsWithMDtag(sam_dir: str, output_dir: str=None,
+                             suppress_output=False) -> None:
+    """
+    Use samtools to filter out segments that do not have an MD tag
+    """
+    if output_dir is None:
+        output_dir = f'{name}_only_md.sam'
+    samtools_command = f'samtools view -h -d MD {sam_dir} > {output_dir}'
+    terminalExecute(samtools_command, suppress_output=suppress_output)
 
 
 def sumMatchesAndMismatches(segment):
@@ -36,12 +48,6 @@ def percent_identity(segment):
 def has_MD_tag(segment):
     return 'MD' in [tag for (tag, _) in segment.get_tags()]
 
-def file_has_MD_tags(samfile):
-    """
-    Check if SAM file has MD tags (at least in the first few segments)
-    """
-    return any([has_MD_tag(seg) for seg in samfile.head(100)])
-
 def filterSAMbyIdentity(input_path, identity_cutoff=95, output_path=None):
     """
     Filter aligned segments in BAM or SAM file with percent identity
@@ -53,8 +59,6 @@ def filterSAMbyIdentity(input_path, identity_cutoff=95, output_path=None):
                        f'.identity_filtered_at_{identity_cutoff}{file_ext}') 
     
     samfile = pysam.AlignmentFile(input_path, 'r')
-    if not file_has_MD_tags(samfile):
-        raise ValueError(f'MD tags not found in {file_ext[1:].upper()} file')
     filtered_sam = pysam.AlignmentFile(output_path, 'wb', template=samfile)
     for segment in samfile:
         if (has_MD_tag(segment) and percent_identity(segment) >= identity_cutoff):
@@ -69,8 +73,6 @@ def computeSAMstatistics(input_path, identity_cutoff=95):
     """
     file_ext = re.search('.(s|b)am', input_path).group()
     samfile = pysam.AlignmentFile(input_path, 'r')
-    if not file_has_MD_tags(samfile):
-        raise ValueError(f'MD tags not found in {file_ext[1:].upper()} file')
     
     total_segments, segments_without_md, segments_above_cutoff = 0, 0, 0
     identity_distribution = []

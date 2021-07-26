@@ -28,8 +28,8 @@ def makeBWAindex(fasta_file: str, db_prefix=None, suppress_output=False) -> None
     terminalExecute(bwa_index_command,suppress_output=suppress_output)
     
 def bwaAlign(fasta_file: str, fastq_1_file: str, fastq_2_file: str=None, 
-             n_threads: int=1, output_dir: str=None, only_mapped: bool=False,
-             db_prefix=None, additional_params: str=None, suppress_output=False) -> None:
+             n_threads: int=1, output_dir: str=None, db_prefix=None,
+             additional_params: str=None, suppress_output=False) -> None:
     """
     Align sequences to reference genome through BWA-mem
     only_mapped: return only primarily aligned fragments.
@@ -39,10 +39,6 @@ def bwaAlign(fasta_file: str, fastq_1_file: str, fastq_2_file: str=None,
         db_prefix = os.path.basename(fasta_file).split('.')[0]
     if output_dir is None:
         output_dir = f'{os.path.basename(fastq_1_file).split("_1.")[0]}.sam'
-    if only_mapped:
-        output_str = f'| samtools view -S -h -F 4 - > {output_dir}'
-    else:
-        output_str = f'> {output_dir}'
     bwa_command = (f'bwa mem -M -t {n_threads} {db_prefix} '
-                   f'{fastq_1_file} {fastq_2_file} {output_str}')
+                   f'{fastq_1_file} {fastq_2_file} > {output_dir}')
     terminalExecute(bwa_command, suppress_output=suppress_output)
