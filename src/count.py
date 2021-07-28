@@ -1,6 +1,7 @@
 """
 Functions to call mapped read counters and process count data
 """
+import os
 import numpy as np
 import pandas as pd
 from .utils import terminalExecute
@@ -84,6 +85,34 @@ def aggregateTPMresults(tpm_dir: str, sep_type: str='\t',
                          header=0, sep=sep_type)
         li.append(df)
 
+    df = pd.concat(li, axis=1, ignore_index=True)
+    df.columns = conditions
+    df.to_csv(output_dir, sep=sep_type)
+    
+def aggregateCountsresults(counts_dir: str, sep_type: str='\t',
+                          output_dir: str=None) -> None:
+    """
+    Aggregate sample counts files into a single file
+    counts_dir: path to directory containing tpm files
+    """
+    if output_dir is None:
+        output_dir = os.path.join(counts_dir, 'aggregated_counts.tsv')
+    counts_files = os.listdir(counts_dir)
+    li = []
+    conditions = []
+    for fname in counts_files:
+        sample_id = os.path.basename(fname).split('_')[0]
+        conditions.append(sample_id)
+        df = pd.read_csv(os.path.join(counts_dir, fname),
+                         header=None, sep=sep_type)
+        df.columns = ['gene_id', 'counts']
+        df = df.set_index('gene_id')
+        # Remove summary data entries
+        for i, row in df.iterrows():
+            if row.name.startswith('__'):
+                df = df.drop(row.name)
+        li.append(df)
+    
     df = pd.concat(li, axis=1, ignore_index=True)
     df.columns = conditions
     df.to_csv(output_dir, sep=sep_type)
