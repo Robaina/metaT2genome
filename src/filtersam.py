@@ -14,6 +14,7 @@ def extractSegmentsWithMDtag(sam_dir: str, output_dir: str=None,
     Use samtools to filter out segments that do not have an MD tag
     """
     if output_dir is None:
+        name = sam_dir
         output_dir = f'{name}_only_md.sam'
     samtools_command = f'samtools view -h -d MD {sam_dir} > {output_dir}'
     terminalExecute(samtools_command, suppress_output=suppress_output)
