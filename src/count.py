@@ -12,7 +12,7 @@ def htseqCount(sorted_sam: str, gtf_file: str, feature_type='gene',
                feature_id='gene_id', output_dir=None,
                additional_params: str=None, suppress_output=False) -> None:
     """
-    Count reads in SAM file through hseq-count
+    Count reads in SAM file through htseq-count
     Additional hseq-count params can be passed as a string to the argument: 
     additional_params
     """

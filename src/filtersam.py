@@ -87,7 +87,7 @@ def percent_identity(segment):
     Compute percent identity from MD tag of aligned segment.
     segment: pysam AlignedSegment object.
     """
-    return 100 * (getNumberOfMatches(segment) / sumMatchesAndMismatches(segment))
+    return 100 * ( (segment) / sumMatchesAndMismatches(segment))
 
 def has_MD_tag(segment):
     return 'MD' in [tag for (tag, _) in segment.get_tags()]
