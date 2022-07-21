@@ -6,17 +6,20 @@ import os
 from .utils import terminalExecute
 
 
-def has_bwa_index(fasta_file: str, work_dir=None) -> bool:
+def has_bwa_index(work_dir: str = None, genome_prefix: str = None) -> bool:
     """
     Check if bwa index files exist in work_dir
     """
     if work_dir is None:
         work_dir = os.getcwd()
+    if genome_prefix is None:
+        genome_prefix = ''
     dir_files = os.listdir(work_dir)
-    index_extensions = ['amb', 'ann', 'bwt', 'pac', 'sa']
+    index_extensions = ['.amb', '.ann', '.bwt', '.pac', '.sa']
+    index_files = [genome_prefix + ext for ext in index_extensions]
     return all([
-        any([ext in fname for fname in dir_files])
-        for ext in index_extensions]) == True
+        any([ifname in fname for fname in dir_files])
+        for ifname in index_files]) == True
 
 def makeBWAindex(fasta_file: str, db_prefix=None, suppress_output=False) -> None:
     """
@@ -39,6 +42,10 @@ def bwaAlign(fasta_file: str, fastq_1_file: str, fastq_2_file: str=None,
         db_prefix = os.path.basename(fasta_file).split('.')[0]
     if output_dir is None:
         output_dir = f'{os.path.basename(fastq_1_file).split("_1.")[0]}.sam'
+    if additional_params is None:
+        add_args = ''
+    else:
+        add_args = additional_params
     bwa_command = (f'bwa mem -M -t {n_threads} {db_prefix} '
-                   f'{fastq_1_file} {fastq_2_file} > {output_dir}')
+                   f'{fastq_1_file} {fastq_2_file} {add_args} > {output_dir}')
     terminalExecute(bwa_command, suppress_output=suppress_output)

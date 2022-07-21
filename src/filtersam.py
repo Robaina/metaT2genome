@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 # coding: utf-8
-import pysam
-import sys
+
+import os
 import re
-import time
-import numpy as np
+import pysam
 from .utils import terminalExecute
 
 
-def extractSegmentsWithMDtag(sam_dir: str, output_dir: str=None,
+def extractSegmentsWithMDtag(sam_dir: str, output_dir,
                              suppress_output=False) -> None:
     """
     Use samtools to filter out segments that do not have an MD tag
     """
-    if output_dir is None:
-        name = sam_dir
-        output_dir = f'{name}_only_md.sam'
+    # if output_dir is None:
+    #     output_dir = f'{name}_only_md.sam'
     samtools_command = f'samtools view -h -d MD {sam_dir} > {output_dir}'
     terminalExecute(samtools_command, suppress_output=suppress_output)
     
@@ -87,7 +85,7 @@ def percent_identity(segment):
     Compute percent identity from MD tag of aligned segment.
     segment: pysam AlignedSegment object.
     """
-    return 100 * ( (segment) / sumMatchesAndMismatches(segment))
+    return 100 * (getNumberOfMatches(segment) / sumMatchesAndMismatches(segment))
 
 def has_MD_tag(segment):
     return 'MD' in [tag for (tag, _) in segment.get_tags()]
@@ -133,60 +131,42 @@ def filterSAMbyPercentMatched(input_path, matched_cutoff=50,
             
     filtered_sam.close()
     samfile.close()
-    
-def computeSAMstatistics(input_path, identity_cutoff=95):
+
+def filterSAMbyReadLength(input_path: str, min_length: int = 100,
+                          output_path: str = None) -> None:
     """
-    Some basic statistics about percent identity
+    Filter aligned segments by original read length (per CIGAR string) 
     """
     file_ext = re.search('.(s|b)am', input_path).group()
+    if output_path is None:
+        output_path = (f'{input_path.split(file_ext)[0]}'
+                       f'_length_filtered_at_{min_length}{file_ext}') 
+    
     samfile = pysam.AlignmentFile(input_path, 'r')
-    
-    total_segments, segments_without_md, segments_above_cutoff = 0, 0, 0
-    identity_distribution = []
+    filtered_sam = pysam.AlignmentFile(output_path, 'w', template=samfile)
     for segment in samfile:
-        total_segments += 1
-        if has_MD_tag(segment):
-            I = percent_identity(segment)
-            if I >= identity_cutoff:
-                segments_above_cutoff += 1
-                identity_distribution.append(I)
-        else:
-            segments_without_md += 1
+        seq_length = getQueryLength(segment)
+        if seq_length >= min_length:
+            filtered_sam.write(segment)
+            
+    filtered_sam.close()
     samfile.close()
-    out = {'n_total': total_segments, 'n_without_md': segments_without_md,
-           'n_above_cutoff': segments_above_cutoff, 'Idist': identity_distribution}
-    
-    print(f'Identity stats for: {input_file}')
-    print(f'Total segments: {out["n_above_cutoff"]}')
-    print(f'% without MD: {100 * out["n_without_md"] / out["n_total"]}')
-    print(f'% above cutoff: {100 * out["n_above_cutoff"] / out["n_total"]}')
-    print(f'Average Identity: {np.mean(out["Idist"])}%')
-    
-    return out
-    
 
+def filterSAMbyReadNames(input_path: str,
+                         output_path: str = None,
+                         query_name_txt: str = None) -> None:
+    """
+    Extract aligned segments whose name containedd in query_name_txt:
+    samtools view -N qnames_list.txt -o filtered_output.bam input.bam
+    from here: https://bioinformatics.stackexchange.com/questions/3380/how-to-subset-a-bam-by-a-list-of-qnames
 
-# Run script: python3 filter_by_identity.py input.bam identity_cutoff [output_path]
-if __name__ == "__main__":
+    query_name_txt: text file containing a list of read names (matching names in SAM file)
     """
-    Filter records in SAM/BAM file by given percent identity.
-    Usage: 
-    python3 filter_by_identity.py input.{bam|sam} identity_cutoff [output_path]
-    """
-    
-    input_file = sys.argv[1]
-    if (len(sys.argv) > 2):
-        identity_cutoff = int(sys.argv[2])
-    else:
-        identity_cutoff = 95
-    if (len(sys.argv) > 3):
-        output_path = int(sys.argv[3])
-    else:
-        output_path = None
-    
-    start = time.time()
-    filterSAMbyIdentity(input_file, identity_cutoff, output_path)
-    # out = computeSAMstatistics(input_file, identity_cutoff)
-    end = time.time()
-    
-    print(f'Execution time: {end - start}')
+    if output_path is None:
+        basename, ext = os.path.splitext(input_path)
+        output_path = (f'{basename}'
+                       f'_filtered_by_name{ext}') 
+    cmd_str= (
+        f"samtools view -h -N {query_name_txt} -o {output_path} {input_path}"
+    )
+    terminalExecute(cmd_str)

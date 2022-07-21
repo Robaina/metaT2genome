@@ -1,6 +1,7 @@
 """
 Functions and classes to deal with GeneBank files
 """
+
 from Bio import SeqIO
 import os
 
@@ -8,7 +9,7 @@ import os
 class GenomeGBK:
 
     def __init__(self, path_to_gbk):
-        self._gbk = list(SeqIO.parse(path_to_gbk, 'genbank'))[0]
+        self._gbk = next(SeqIO.parse(path_to_gbk, 'genbank'))
 
     @property
     def meta(self):
@@ -64,7 +65,7 @@ def convertGBKtoGTFfile(gbk_file: str, chr_id: str=None,
                         f'\t{strand}\t.\tgene_id {locus_tag} ; transcript_id {locus_tag}')
                 gtf.write(f'{line}\n')
                 
-def getGeneLengthsFromGBK(gbk_file: str) -> dict:
+def getGeneLengthsFromGBK(gbk_file: str, feature_type: str='gene') -> dict:
     """
     Obtain gene lengths in bp for genes in gbk file
     """
@@ -72,5 +73,24 @@ def getGeneLengthsFromGBK(gbk_file: str) -> dict:
     return {
         feature.qualifiers['locus_tag'][0]: (feature.location.end.position - 
                                              feature.location.start.position)
-        for feature in gbk.features if feature.type == 'gene'
+        for feature in gbk.features if feature.type.lower() in feature_type.lower()
     }
+
+def extractLocusTagInfoFromGBK(path_to_gbk: str,
+                               fields: list = ['gene', 'product', 'EC_number'],
+                               feature_type: str = 'cds') -> dict:
+    """
+    Assign info to locus tags
+    """
+    def assign_field_info(field):
+        return feature.qualifiers[field][0] if field in feature.qualifiers else 'unspecified'
+
+    gbk = GenomeGBK(path_to_gbk)
+    locus_tag_info = {}
+    for feature in gbk.features:
+        if feature.type.lower() in feature_type.lower():
+            locus_tag_info[feature.qualifiers['locus_tag'][0]] = {
+                field: assign_field_info(field)
+                for field in fields
+            }
+    return locus_tag_info
